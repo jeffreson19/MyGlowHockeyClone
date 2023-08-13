@@ -1,0 +1,144 @@
+
+
+<VerticalBar>:
+    
+    # size: be the size i give it in the code
+    xRightBar: self.parent.width-self.size[0]
+    canvas:
+        Color:
+            rgb: 1, self.g1, 1
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos #pos given in code
+            radius: [(4, 4), (4, 4), (4, 4), (4, 4)]
+        Color:
+            rgb: 1, self.g2, 1
+        RoundedRectangle:
+            size: self.size
+            pos: self.parent.width-self.size[0], self.pos[1] #pos given in code
+            radius: [(4, 4), (4, 4), (4, 4), (4, 4)]
+
+        # TODO: rounded rectangles 
+
+<HorizontalBar>:
+    yTopBar: self.parent.height-self.size[1] 
+    canvas:
+        Color:
+            rgb: self.r,0.6,1
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos #pos given in code
+            radius: [(4, 4), (4, 4), (4, 4), (4, 4)]
+        
+        RoundedRectangle:
+            size: self.size
+            pos: self.x, self.parent.height-self.size[1]  #pos given in code
+            radius: [(4, 4), (4, 4), (4, 4), (4, 4)]
+        
+<Ball>:
+    size: 25,25 #you do this so that the ball widget is the same size as the ellipse size if not it would be the default 100, 100 size
+    left: self.x + self.width
+    
+    canvas:
+        Color: 
+            rgb: 1,1,1
+        Ellipse:
+            pos: self.pos #do this so that the pos of the ellipse will be at the pos of the ball widget itself
+            size: self.size
+
+<Player1>:
+    size: 40, 40
+    canvas: 
+        Color:
+            rgba: 1,0,0,1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+            
+<Player2>:
+    size: 40, 40
+    canvas: 
+        Color:
+            rgba: 0,0,0,1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+
+<Bot>:
+    size: 40, 40
+    canvas: 
+        Color:
+            rgba: 1,0,1,1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+
+
+
+
+<Game>:
+    vBar_down: vbar_one
+    vBar_up: vbar_two
+    hBar_left: hbar_one
+    hBar_right: hbar_two
+    ball: ball
+    player1: player_1
+    player2: player_2
+    bot1: bot_1
+    
+
+    canvas:
+        Line:
+            points: 0, self.center_y, self.width, self.center_y
+        Line:
+            circle: self.center_x, self.center_y, 50
+        Line: #top semi circle
+            circle: self.center_x, self.height, 50
+        Line: #bottom semi circle
+            circle: self.center_x, 0, 50
+
+    Label:
+
+        text: str(self.parent.score1) + "\n" + str(self.parent.score2)
+        color: 0, 1, 1
+        center: self.parent.width-25, self.parent.center_y 
+        font_size: '30sp'
+    # Make the positions of the bars more dinamic
+
+    VerticalBar:
+        id: vbar_one
+        size: 10, self.parent.height/2.1
+        pos: 0, 10
+    
+    VerticalBar:
+        id: vbar_two
+        size: 10, self.parent.height/2.1
+        pos: 0, vbar_one.top+6
+
+    HorizontalBar:
+        id: hbar_one 
+        size: self.parent.size[0]/2.5, 10
+        pos: 0, 0
+
+    HorizontalBar:
+        id: hbar_two
+        size: self.parent.size[0]/2.5, 10
+        pos: self.parent.width-self.width,2
+
+    Ball:
+        id: ball
+        center: self.parent.center
+    Player1:
+        id: player_1
+        center: self.parent.center_x, 50
+    
+    Player2:
+        id: player_2
+        center: self.parent.center_x, self.parent.height-50
+    
+    Bot:
+        id: bot_1
+        center: self.parent.center_x, self.parent.height-50
+
+    
+    
