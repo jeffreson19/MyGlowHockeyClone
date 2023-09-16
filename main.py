@@ -1,3 +1,4 @@
+import math
 import random
 from kivy.config import Config
 Config.set('graphics', 'width', '378')
@@ -6,6 +7,8 @@ Config.set('graphics', 'height', '570')
 
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.uix.label import Label
 from kivy.properties import ObjectProperty, NumericProperty, StringProperty
 from kivy.clock import Clock
 from kivy.graphics import Color
@@ -43,8 +46,8 @@ class HorizontalBar(Widget):
         # TODO: edge case
 
 class Ball(Widget):
-    xVel = NumericProperty(2.3)
-    yVel = NumericProperty(-3.3)
+    xVel = NumericProperty(0)
+    yVel = NumericProperty(0)
     
     playerScore = NumericProperty(0)
     botScore = NumericProperty(0)
@@ -60,7 +63,6 @@ class Ball(Widget):
         self.yVel = 0
         # send players back to original pos
         game.player1.center = game.center_x, 50
-        game.player2.center = game.center_x, game.height-50
         game.bot1.center = game.center_x, game.height-50
         # serve the ball to player 1
         self.center = game.center_x, game.height/2.5
@@ -70,99 +72,78 @@ class Ball(Widget):
         self.yVel = 0
         # send players back to original pos
         game.player1.center = game.center_x, 50
-        game.player2.center = game.center_x, game.height-50
         game.bot1.center = game.center_x, game.height-50
         # serve the ball to player 2
         self.center = game.center_x, game.height - game.height/2.5
 
-
-
-
-        
-        
+     
 class Player1(Widget):
 
     def collision(self, ball):
         #distance thing 
         d_sqrd = (ball.center_x - self.center_x)**2 + (ball.center_y - self.center_y)**2
         r_sqrd = (ball.size[0]/2 + self.size[0]/2)**2
-        
+        # math.dist([ball.center_x, ball.center_y], [self.center_x, self.center_y]) another way to do this
 
         if (d_sqrd <= r_sqrd): #so if there is an intersection i need to find out what quadrant of the pad the ball is hitting 
             #intersection point 
-            x_intrsct = (ball.center_x + self.center_x)/2 #note value can be -tive
-            y_intrsct = (ball.center_y + self.center_y)/2 #nn value can be -tive
-            if x_intrsct < 0 : 
-                x_intrsct = x_intrsct * -1
-            if y_intrsct < 0 : 
-                y_intrsct = y_intrsct * -1
+            x_intrsct = math.fabs((ball.center_x + self.center_x)/2) #note value can be -tive
+            y_intrsct = math.fabs((ball.center_y + self.center_y)/2) #nn value can be -tive
            #top right quad
             if (x_intrsct > self.center_x) and (y_intrsct > self.center_y):
-                ball.xVel = +4
-                ball.yVel = +4
+                # y = mx + c, m=+1 cI = self.center_y - self.center_x
+                # normal m=-1 cII = y_intrsct + x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y - self.center_x) + (y_intrsct + x_intrsct))/2
+
+                if y_intrsct > normal_y:
+                    ball.xVel = +2.95
+                    ball.yVel = +4  
+                elif y_intrsct < normal_y:
+                    ball.xVel = +4
+                    ball.yVel = +2.95
+                # else:
+                #     print("does the code ever reach here?nope!")
+                #     ball.xVel = +4
+                #     ball.yVel = +4
+
             #bottom right quad
             if (x_intrsct > self.center_x) and (y_intrsct < self.center_y):
-                ball.xVel = +4
-                ball.yVel = -4
+                # y = mx + c, m=+1 cI = self.center_y + self.center_x
+                # normal m=-1 cII = y_intrsct - x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y + self.center_x) + (y_intrsct - x_intrsct))/2
+                if y_intrsct > normal_y:
+                    ball.xVel = +4
+                    ball.yVel = -2.95  
+                elif y_intrsct < normal_y:
+                    ball.xVel = +2.95
+                    ball.yVel = -4
             #bottom left quad
             if (x_intrsct < self.center_x) and (y_intrsct < self.center_y):
-                ball.xVel = -4
-                ball.yVel = -4
+                # y = mx + c, m=+1 cI = self.center_y - self.center_x
+                # normal m=-1, cII = y_intrsct + x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y - self.center_x) + (y_intrsct + x_intrsct))/2
+                if y_intrsct > normal_y:
+                    ball.xVel = -4
+                    ball.yVel = -2.95
+                elif y_intrsct < normal_y:
+                    ball.xVel = -2.95
+                    ball.yVel = -4
             #top left quad
             if (x_intrsct < self.center_x) and (y_intrsct > self.center_y):
-                ball.xVel = -4
-                ball.yVel = +4
+                # y = mx + c, m=+1 cI = self.center_y + self.center_x
+                # normal m=-1 cII = y_intrsct - x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y + self.center_x) + (y_intrsct - x_intrsct))/2
 
-
-class Player2(Widget):
-
-    def collision(self, ball):
-        #distance thing 
-        d_sqrd = (ball.center_x - self.center_x)**2 + (ball.center_y - self.center_y)**2
-        r_sqrd = (ball.size[0]/2 + self.size[0]/2)**2
-        
-
-        if (d_sqrd <= r_sqrd): #so if there is an intersection i need to find out what quadrant of the pad the ball is hitting 
-            #intersection point 
-            x_intrsct = (ball.center_x + self.center_x)/2 #note value can be -tive
-            y_intrsct = (ball.center_y + self.center_y)/2 #nn value can be -tive
-            if x_intrsct < 0 : 
-                x_intrsct = x_intrsct * -1
-            if y_intrsct < 0 : 
-                y_intrsct = y_intrsct * -1
-           #top right quad
-            if (x_intrsct > self.center_x) and (y_intrsct > self.center_y):
-                ball.xVel = +4
-                ball.yVel = +4
-            #bottom right quad
-            if (x_intrsct > self.center_x) and (y_intrsct < self.center_y):
-                ball.xVel = +4
-                ball.yVel = -4
-            #bottom left quad
-            if (x_intrsct < self.center_x) and (y_intrsct < self.center_y):
-                ball.xVel = -4
-                ball.yVel = -4
-            #top left quad
-            if (x_intrsct < self.center_x) and (y_intrsct > self.center_y):
-                ball.xVel = -4
-                ball.yVel = +4
-            #center top
-            if (x_intrsct == self.center_x) and (y_intrsct == self.center_y+self.height/2):
-                ball.xVel = 0
-                ball.yVel = +4
-            #center bottom
-            if (x_intrsct == self.center_x) and (y_intrsct == self.center_y-self.height/2):
-                ball.xVel = 0
-                ball.yVel = -4
-            #center right
-            if (x_intrsct == self.center_x+self.width/2) and (y_intrsct == self.center_y):
-                ball.xVel = +4
-                ball.yVel = 4
-            #center left
-            if (x_intrsct == self.center_x-self.width/2) and (y_intrsct == self.center_y):
-                ball.xVel = -4
-                ball.yVel = 0
-
+                if y_intrsct > normal_y:
+                    ball.xVel = -2.95
+                    ball.yVel = +4  
+                elif y_intrsct < normal_y:
+                    ball.xVel = -4
+                    ball.yVel = +2.95
 
 class Bot(Widget):
     # move bot
@@ -184,7 +165,7 @@ class Bot(Widget):
                 self.yVel = +2.5
             # if the ball is below the bot move down
             if game.ball.center_y < self.center_y:
-                self.yVel = -2.5 
+                self.yVel = -2.5
             # if the ball is on the left move right 
             if game.ball.center_x < self.center_x:
                 self.xVel = -2.5
@@ -194,9 +175,7 @@ class Bot(Widget):
             if self.y <= game.center_y:
                 self.yVel = +2.5
             self.pos = (self.x+self.xVel, self.y+self.yVel)     
-        
-        
-    
+          
     # check collision
     def collision(self, ball):
         #distance thing 
@@ -206,33 +185,74 @@ class Bot(Widget):
 
         if (d_sqrd <= r_sqrd): #so if there is an intersection i need to find out what quadrant of the pad the ball is hitting 
             #intersection point 
-            x_intrsct = (ball.center_x + self.center_x)/2 #note value can be -tive
-            y_intrsct = (ball.center_y + self.center_y)/2 #nn value can be -tive
-            if x_intrsct < 0 : 
-                x_intrsct = x_intrsct * -1
-            if y_intrsct < 0 : 
-                y_intrsct = y_intrsct * -1
+            x_intrsct = math.fabs((ball.center_x + self.center_x)/2) #note value can be -tive
+            y_intrsct = math.fabs((ball.center_y + self.center_y)/2) #nn value can be -tive
            #top right quad
             if (x_intrsct > self.center_x) and (y_intrsct > self.center_y):
-                ball.xVel = +4
-                ball.yVel = +4
+                # y = mx + c, m=+1 cI = self.center_y - self.center_x
+                # normal m=-1 cII = y_intrsct + x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y - self.center_x) + (y_intrsct + x_intrsct))/2
+
+                if y_intrsct > normal_y:
+                    ball.xVel = +2.95
+                    ball.yVel = +4  
+                elif y_intrsct < normal_y:
+                    ball.xVel = +4
+                    ball.yVel = +2.95
+                # else:
+                #     print("does the code ever reach here?nope!")
+                #     ball.xVel = +4
+                #     ball.yVel = +4
+
             #bottom right quad
             if (x_intrsct > self.center_x) and (y_intrsct < self.center_y):
-                ball.xVel = +4
-                ball.yVel = -4
+                # y = mx + c, m=+1 cI = self.center_y + self.center_x
+                # normal m=-1 cII = y_intrsct - x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y + self.center_x) + (y_intrsct - x_intrsct))/2
+                if y_intrsct > normal_y:
+                    ball.xVel = +4
+                    ball.yVel = -2.95  
+                elif y_intrsct < normal_y:
+                    ball.xVel = +2.95
+                    ball.yVel = -4
             #bottom left quad
             if (x_intrsct < self.center_x) and (y_intrsct < self.center_y):
-                ball.xVel = -4
-                ball.yVel = -4
+                # y = mx + c, m=+1 cI = self.center_y - self.center_x
+                # normal m=-1, cII = y_intrsct + x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y - self.center_x) + (y_intrsct + x_intrsct))/2
+                if y_intrsct > normal_y:
+                    ball.xVel = -4
+                    ball.yVel = -2.95
+                elif y_intrsct < normal_y:
+                    ball.xVel = -2.95
+                    ball.yVel = -4
             #top left quad
             if (x_intrsct < self.center_x) and (y_intrsct > self.center_y):
-                ball.xVel = -4
-                ball.yVel = +4
+                # y = mx + c, m=+1 cI = self.center_y + self.center_x
+                # normal m=-1 cII = y_intrsct - x_intrsct
+                # normal_y = (cI + cII)/2
+                normal_y = ((self.center_y + self.center_x) + (y_intrsct - x_intrsct))/2
+
+                if y_intrsct > normal_y:
+                    ball.xVel = -2.95
+                    ball.yVel = +4  
+                elif y_intrsct < normal_y:
+                    ball.xVel = -4
+                    ball.yVel = +2.95
             # after they collide the bot should not move
             if (ball.y > self.gamesCenter_y): #and colliding
                 self.xVel = 0
                 self.yVel = 0
 
+class StartMenu(Widget):
+    alpha = NumericProperty(1)
+    gameStarted = False
+         
+
+    
 class Game(Widget):
     vBar_down = ObjectProperty()
     vBar_up = ObjectProperty()
@@ -240,17 +260,16 @@ class Game(Widget):
     hBar_right = ObjectProperty()
     ball = ObjectProperty()
     player1 = ObjectProperty()
-    player2 = ObjectProperty()
     score1 = NumericProperty()
     score2 = NumericProperty()
     bot1 = ObjectProperty()
-
+    start_menu = ObjectProperty()
+    
     def update(self, dt):
         self.ball.move()
         self.bot1.move(self)
 
         self.player1.collision(self.ball)
-        # self.player2.collision(self.ball)
         self.bot1.collision(self.ball)
 
         self.vBar_down.collision(self.ball)
@@ -267,29 +286,31 @@ class Game(Widget):
             self.score2 += 1
             self.ball.serve_player2(self)
 
-
+    
     
     def on_touch_move(self, touch):
         #player1 input 
         if (touch.y <= self.center_y-self.player1.height/2) and (self.player1.width/2 <= touch.x <= self.width-self.player1.width/2):
             self.player1.center = (touch.x, touch.y)
-        #player2 input
-        if (touch.y >= self.center_y+self.player2.height/2) and (self.player1.width/2 <= touch.x <= self.width-self.player1.width/2):
-            self.player2.center = (touch.x, touch.y)
+        
         
         
     def on_touch_down(self, touch):
-        #player1 input 
-        if (touch.y < self.center_y-self.player1.height/2 ) and (self.player1.width/2 <= touch.x <= self.width-self.player1.width/2):
-            self.player1.center = (touch.x, touch.y)
-        #player2 input
-        if (touch.y  > self.center_y+self.player2.height/2) and (self.player1.width/2 <= touch.x <= self.width-self.player1.width/2):
-            self.player2.center = (touch.x, touch.y)
+        if self.start_menu.gameStarted == False:
+            self.start_menu.clear_widgets()
+            self.start_menu.alpha = 0
         
+            #player1 input 
+            if (touch.y < self.center_y-self.player1.height/2 ) and (self.player1.width/2 <= touch.x <= self.width-self.player1.width/2):
+                self.player1.center = (touch.x, touch.y)
+
+
+
+
 class GlowApp(App):
     def build(self):
         game = Game()
-        Clock.schedule_interval(game.update, 1.0/60.0)
+        Clock.schedule_interval(game.update, 0.10/60.0)
         return game
 
 if __name__ == '__main__':

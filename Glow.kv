@@ -1,7 +1,6 @@
 
 
-<VerticalBar>:
-    
+<VerticalBar>:   
     # size: be the size i give it in the code
     xRightBar: self.parent.width-self.size[0]
     canvas:
@@ -18,8 +17,6 @@
             pos: self.parent.width-self.size[0], self.pos[1] #pos given in code
             radius: [(4, 4), (4, 4), (4, 4), (4, 4)]
 
-        # TODO: rounded rectangles 
-
 <HorizontalBar>:
     yTopBar: self.parent.height-self.size[1] 
     canvas:
@@ -29,7 +26,6 @@
             size: self.size
             pos: self.pos #pos given in code
             radius: [(4, 4), (4, 4), (4, 4), (4, 4)]
-        
         RoundedRectangle:
             size: self.size
             pos: self.x, self.parent.height-self.size[1]  #pos given in code
@@ -53,16 +49,7 @@
             rgba: 1,0,0,1
         Ellipse:
             pos: self.pos
-            size: self.size
-            
-<Player2>:
-    size: 40, 40
-    canvas: 
-        Color:
-            rgba: 0,0,0,1
-        Ellipse:
-            pos: self.pos
-            size: self.size
+            size: self.size      
 
 <Bot>:
     size: 40, 40
@@ -73,9 +60,17 @@
             pos: self.pos
             size: self.size
 
-
-
-
+<StartMenu>:
+    canvas:
+        Color: 
+            rgba: 0.7 , 0.7 , 0.7 , self.alpha
+        Rectangle:
+            size: self.parent.size 
+    Label:
+        text: "P  L  A  Y"
+        color: .0,0,.5
+        pos: 120, 200
+        
 <Game>:
     vBar_down: vbar_one
     vBar_up: vbar_two
@@ -83,10 +78,9 @@
     hBar_right: hbar_two
     ball: ball
     player1: player_1
-    player2: player_2
     bot1: bot_1
+    start_menu: start_menu
     
-
     canvas:
         Line:
             points: 0, self.center_y, self.width, self.center_y
@@ -96,9 +90,8 @@
             circle: self.center_x, self.height, 50
         Line: #bottom semi circle
             circle: self.center_x, 0, 50
-
+   
     Label:
-
         text: str(self.parent.score1) + "\n" + str(self.parent.score2)
         color: 0, 1, 1
         center: self.parent.width-25, self.parent.center_y 
@@ -127,18 +120,13 @@
 
     Ball:
         id: ball
-        center: self.parent.center
+        center: self.parent.center_x, self.parent.height/2.5
     Player1:
         id: player_1
         center: self.parent.center_x, 50
-    
-    Player2:
-        id: player_2
-        center: self.parent.center_x, self.parent.height-50
-    
     Bot:
         id: bot_1
         center: self.parent.center_x, self.parent.height-50
-
     
-    
+    StartMenu:
+        id: start_menu
